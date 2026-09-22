@@ -1,0 +1,36 @@
+# Uncomment for DNS query logging if needed
+#log-queries
+#log-facility=/var/log/dnsmasq.log
+
+dhcp-authoritative
+
+# DNS server advertised on the baremetal network
+dhcp-option=baremetal,option:dns-server,<DNS_SERVER_IP>
+
+# Default gateway advertised on the baremetal network
+dhcp-option=baremetal,option:router,<GATEWAY_IP>
+
+# Forward external DNS queries to the upstream DNS server
+server=<GATEWAY_IP>
+
+strict-order
+domain-needed
+bogus-priv
+cache-size=1000
+
+# Listen on the OpenShift baremetal bridge
+interface=baremetal
+
+# Read local host records from /etc/hosts
+expand-hosts
+
+# Treat the OpenShift cluster domain as local
+local=/<CLUSTER_NAME>.<BASE_DOMAIN>/
+
+# Wildcard application DNS
+address=/.apps.<CLUSTER_NAME>.<BASE_DOMAIN>/<INGRESS_VIP>
+
+# Add these entries separately to /etc/hosts:
+#
+# <API_VIP>      api.<CLUSTER_NAME>.<BASE_DOMAIN>
+# <INGRESS_VIP>     apps.<CLUSTER_NAME>.<BASE_DOMAIN>

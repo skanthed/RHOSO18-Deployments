@@ -43,7 +43,40 @@ Download your pull secret from the [Red Hat Hybrid Cloud Console](https://consol
 assets/pull_secret.json
 ```
 
-### 3. Configure the install-config template
+### 3. Configure DNS on the Jump Host
+The OpenShift cluster requires DNS records for the API, internal API, wildcard applications domain, and control-plane nodes.
+
+In this deployment, `dnsmasq` runs on the jump host and provides DNS service through the `baremetal` bridge.
+
+#### 3.1 Find the DNS Server IP
+
+The DNS server IP is the IPv4 address assigned to the jump host's `baremetal` bridge.
+
+```bash
+ip -4 addr show baremetal
+```
+
+#### 3.2 Install and Configure dnsmasq
+
+```bash
+sudo dnf install -y dnsmasq
+sudo cp dnsmasq-cluster.conf.example /etc/dnsmasq.d/<CLUSTER_NAME>.conf
+sudo vi /etc/dnsmasq.d/<CLUSTER_NAME>.conf
+```
+
+#### 3.3 Enable and Verify dnsmasq
+
+```bash
+sudo firewall-cmd --permanent --add-service=dns
+sudo firewall-cmd --reload
+
+sudo systemctl enable --now dnsmasq
+sudo systemctl restart dnsmasq
+sudo systemctl status dnsmasq
+```
+
+
+### 4. Configure the install-config template
 
 Update `assets/install-config-template.yaml` with your environment-specific configuration, including:
 
