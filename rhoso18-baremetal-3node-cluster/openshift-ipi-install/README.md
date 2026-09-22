@@ -6,7 +6,20 @@ Scripts and configuration for deploying a compact (3-master, 0-worker) OpenShift
 
 ## Prerequisites
 
-Before running the installation:
+Before starting the OpenShift 4.18 bare-metal IPI installation, prepare the dedicated jump host and installation files.
+
+The jump host setup follows the Red Hat bare-metal IPI environment preparation workflow through:
+
+- 3.1 Installing RHEL on the jump host
+- 3.2 Preparing the jump host
+- 3.3 Checking NTP synchronization
+- 3.4 Configuring networking on the jump host
+
+Red Hat reference:
+
+https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/deploying_installer-provisioned_clusters_on_bare_metal/ipi-install-installation-workflow
+
+On Jumphost follow the steps below:
 
 ### 1. Download and extract the OpenShift client
 
