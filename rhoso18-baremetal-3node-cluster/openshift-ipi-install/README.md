@@ -13,7 +13,7 @@ The jump host setup follows the Red Hat bare-metal IPI environment preparation w
 - 3.1 Installing RHEL on the jump host
 - 3.2 Preparing the jump host
 - 3.3 Checking NTP synchronization
-- 3.4 Configuring networking on the jump host
+- 3.4 Configuring networking on the jump host and use the Example bare-metal bridge interface configuration that uses DHCP
 
 Red Hat reference:
 
