@@ -1,41 +1,82 @@
 apiVersion: v1
+
+# <BASE_DOMAIN> = DNS base domain for the cluster.
+# Example: cluster.com
 baseDomain: <BASE_DOMAIN>
+
 networking:
   networkType: OVNKubernetes
+
+  # <MACHINE_CIDR> = Network CIDR used by the physical OpenShift nodes.
+  # Find this from your network/subnet configuration.
+  # Example: 10.5.0.0/22
   machineCIDR: <MACHINE_CIDR>
+
   clusterNetwork:
   - cidr: "10.128.0.0/14"
     hostPrefix: 23
+
   serviceNetwork:
   - "172.30.0.0/16"
+
 metadata:
+  # <CLUSTER_NAME> = Name of the OpenShift cluster.
+  # Example: rhoso-oac
   name: <CLUSTER_NAME>
+
 compute:
 - name: worker
   replicas: 0
+
 controlPlane:
   name: master
   replicas: 3
   platform:
     baremetal: {}
+
 platform:
   baremetal:
     externalBridge: "baremetal"
+
+    # <BOOTSTRAP_PROVISIONING_IP> = Unused IP from the machine network
+    # that will be assigned to the temporary bootstrap VM.
     bootstrapProvisioningIP: <BOOTSTRAP_PROVISIONING_IP>
+
     provisioningNetwork: "Disabled"
+
+    # <API_VIP> = Unused virtual IP used by the OpenShift API.
+    # DNS record api.<cluster>.<baseDomain> must point to this IP.
     apiVIP: <API_VIP>
+
+    # <INGRESS_VIP> = Unused virtual IP used by OpenShift application ingress.
+    # Wildcard DNS *.apps.<cluster>.<baseDomain> must point to this IP.
     ingressVIP: <INGRESS_VIP>
+
     hosts:
       - name: master-0
         role: master
         bmc:
+          # <BMC_IP_MASTER_0> = iDRAC/BMC management IP for master-0.
+          # Find this from iDRAC or server-management network records.
           address: idrac-virtualmedia://<BMC_IP_MASTER_0>/redfish/v1/Systems/System.Embedded.1
+
+          # <BMC_USERNAME> = iDRAC/BMC login username.
           username: <BMC_USERNAME>
+
+          # <BMC_PASSWORD> = iDRAC/BMC login password.
+          # Do not commit real credentials to Git.
           password: <BMC_PASSWORD>
+
           disableCertificateVerification: True
+
+        # <BOOT_MAC_MASTER_0> = MAC address of the primary boot/data NIC for master-0.
+        # Find it from iDRAC, the server OS, or switch MAC table.
         bootMACAddress: <BOOT_MAC_MASTER_0>
+
         rootDeviceHints:
+          # OS installation target disk. Confirm this matches the server.
           deviceName: "/dev/sda"
+
         networkConfig:
           interfaces:
             - name: eno1
@@ -43,14 +84,21 @@ platform:
               state: up
               ipv4:
                 address:
+                # <IP_MASTER_0> = Static OpenShift machine-network IP for master-0.
                 - ip: <IP_MASTER_0>
+
+                  # <NETWORK_PREFIX_LENGTH> = Prefix length from MACHINE_CIDR.
+                  # Example: 10.5.0.0/22 -> 22
                   prefix-length: <NETWORK_PREFIX_LENGTH>
                 enabled: true
                 dhcp: false
               ipv6:
                 enabled: false
                 dhcp: false
+
+              # Must match the primary NIC used above as bootMACAddress.
               mac-address: <BOOT_MAC_MASTER_0>
+
             - name: eno2
               type: ethernet
               state: absent
@@ -60,7 +108,7 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
-                address:
+
             - name: ens2f0
               type: ethernet
               state: absent
@@ -70,6 +118,7 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
+
             - name: ens2f1
               type: ethernet
               state: absent
@@ -79,26 +128,40 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
+
           dns-resolver:
             config:
               server:
+              # <DNS_SERVER> = DNS server reachable from the OpenShift nodes.
+              # It must resolve the cluster API and wildcard application records,
+              # and also allow required external DNS resolution.
               - <DNS_SERVER>
+
           routes:
             config:
               - destination: '0.0.0.0/0'
+                # <GATEWAY> = Default gateway for the machine network.
+                # Example: 10.5.0.1
                 next-hop-address: <GATEWAY>
+
                 next-hop-interface: eno1
                 metric: 40
+
       - name: master-1
         role: master
         bmc:
+          # <BMC_IP_MASTER_1> = iDRAC/BMC management IP for master-1.
           address: idrac-virtualmedia://<BMC_IP_MASTER_1>/redfish/v1/Systems/System.Embedded.1
           username: <BMC_USERNAME>
           password: <BMC_PASSWORD>
           disableCertificateVerification: True
+
+        # <BOOT_MAC_MASTER_1> = MAC address of the primary boot/data NIC for master-1.
         bootMACAddress: <BOOT_MAC_MASTER_1>
+
         rootDeviceHints:
           deviceName: "/dev/sda"
+
         networkConfig:
           interfaces:
             - name: eno1
@@ -106,6 +169,7 @@ platform:
               state: up
               ipv4:
                 address:
+                # <IP_MASTER_1> = Static OpenShift machine-network IP for master-1.
                 - ip: <IP_MASTER_1>
                   prefix-length: <NETWORK_PREFIX_LENGTH>
                 enabled: true
@@ -114,6 +178,7 @@ platform:
                 enabled: false
                 dhcp: false
               mac-address: <BOOT_MAC_MASTER_1>
+
             - name: eno2
               type: ethernet
               state: absent
@@ -123,7 +188,7 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
-                address:
+
             - name: ens2f0
               type: ethernet
               state: absent
@@ -133,6 +198,7 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
+
             - name: ens2f1
               type: ethernet
               state: absent
@@ -142,26 +208,34 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
+
           dns-resolver:
             config:
               server:
               - <DNS_SERVER>
+
           routes:
             config:
               - destination: '0.0.0.0/0'
                 next-hop-address: <GATEWAY>
                 next-hop-interface: eno1
                 metric: 40
+
       - name: master-2
         role: master
         bmc:
+          # <BMC_IP_MASTER_2> = iDRAC/BMC management IP for master-2.
           address: idrac-virtualmedia://<BMC_IP_MASTER_2>/redfish/v1/Systems/System.Embedded.1
           username: <BMC_USERNAME>
           password: <BMC_PASSWORD>
           disableCertificateVerification: True
+
+        # <BOOT_MAC_MASTER_2> = MAC address of the primary boot/data NIC for master-2.
         bootMACAddress: <BOOT_MAC_MASTER_2>
+
         rootDeviceHints:
           deviceName: "/dev/sda"
+
         networkConfig:
           interfaces:
             - name: eno1
@@ -169,6 +243,7 @@ platform:
               state: up
               ipv4:
                 address:
+                # <IP_MASTER_2> = Static OpenShift machine-network IP for master-2.
                 - ip: <IP_MASTER_2>
                   prefix-length: <NETWORK_PREFIX_LENGTH>
                 enabled: true
@@ -177,6 +252,7 @@ platform:
                 enabled: false
                 dhcp: false
               mac-address: <BOOT_MAC_MASTER_2>
+
             - name: eno2
               type: ethernet
               state: absent
@@ -186,6 +262,7 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
+
             - name: ens3f0
               type: ethernet
               state: absent
@@ -195,6 +272,7 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
+
             - name: ens3f1
               type: ethernet
               state: absent
@@ -204,15 +282,23 @@ platform:
               ipv6:
                 enabled: false
                 dhcp: false
+
           dns-resolver:
             config:
               server:
               - <DNS_SERVER>
+
           routes:
             config:
               - destination: '0.0.0.0/0'
                 next-hop-address: <GATEWAY>
                 next-hop-interface: eno1
                 metric: 40
+
+# <PULL_SECRET> = Red Hat registry pull secret downloaded from
+# Red Hat Hybrid Cloud Console. Keep it private and do not commit it.
 pullSecret: '<PULL_SECRET>'
+
+# <SSH_PUBLIC_KEY> = Public SSH key that will be installed on the cluster nodes.
+# Example source: /home/kni/.ssh/id_rsa.pub
 sshKey: '<SSH_PUBLIC_KEY>'
