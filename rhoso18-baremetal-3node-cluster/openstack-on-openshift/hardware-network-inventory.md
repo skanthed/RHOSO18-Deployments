@@ -33,7 +33,7 @@
 | 10.5.1.16 | Te1/17, Te1/18 | swp11s1 | Removed untagged VLAN 914 from the provisioning ports to avoid conflicts, as a port cannot have two untagged VLANs. |
 
 
-#### Additional Nodes
+### Additional Nodes
 
 | Node IP | Status | Dell Switch Ports | Cumulus Switch Ports |
 | --- | --- | --- | --- |
