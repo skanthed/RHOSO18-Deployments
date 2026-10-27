@@ -1,6 +1,6 @@
-# RHOSO18 — Hardware and Network Configuration
+## RHOSO18 — Hardware and Network Configuration
 
-## VLANs and Networks
+### VLANs and Networks
 
 | VLAN | Network / Purpose | CIDR | Switch-Port Configuration |
 | --- | --- | --- | --- |
@@ -9,13 +9,15 @@
 | 22 | RHOSO Tenant | 172.19.0.0/24 | Tagged on OpenShift `eno2` ports (Dell SW2) |
 | 83 | Ironic provisioning | 172.20.1.0/24 | Tagged on OpenShift `eno17` ports (Cumulus SW1) and the switch interconnect |
 
-## Jump Host
+
+### Jump Host
 
 | Node IP | Role | Dell Switch Ports |
 | --- | --- | --- |
 | 10.5.1.112 | Jump host | Te1/25, Te1/26 |
 
-## OpenShift Master Nodes
+
+### OpenShift Master Nodes
 
 | Node IP | OpenShift Node | Dell Switch Ports | Cumulus Switch Ports |
 | --- | --- | --- | --- |
@@ -23,13 +25,15 @@
 | 10.5.1.14 | master-1 | Te1/19, Te1/20 | swp12s1, swp12s3 |
 | 10.5.1.17 | master-2 | Te1/1, Te1/2 | swp11s0, swp11s2 |
 
-## Ironic Test/Provisioning Node
+
+### Ironic Tested/Provisionied Node
 
 | Node IP | Dell Switch Ports | Cumulus Switch Port | VLAN Configuration |
 | --- | --- | --- | --- |
-| 10.5.1.16 | Te1/17, Te1/18 | swp11s1 | Remove untagged VLAN 914 from the provisioning ports to avoid conflicts, as a port cannot have two untagged VLANs. |
+| 10.5.1.16 | Te1/17, Te1/18 | swp11s1 | Removed untagged VLAN 914 from the provisioning ports to avoid conflicts, as a port cannot have two untagged VLANs. |
 
-## Additional Nodes
+
+#### Additional Nodes
 
 | Node IP | Status | Dell Switch Ports | Cumulus Switch Ports |
 | --- | --- | --- | --- |
