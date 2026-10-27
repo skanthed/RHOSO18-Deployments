@@ -14,7 +14,8 @@ spec:
             lvm: enabled-sdb #apply label to node based on the available disk
         deviceSelector:
           paths:
-            - /dev/sdb #reboot this can change the drive, mention something persistent
+              # Use a persistent disk path to prevent device name changes after reboot; replace with actual disk identifier.
+            - /dev/disk/by-path/<persistent-disk-identifier>
         thinPoolConfig:
           name: thin-pool-1
           sizePercent: 90
@@ -31,7 +32,8 @@ spec:
             lvm: enabled-sda #apply label to node based on the available disk
         deviceSelector:
           paths:
-            - /dev/sda #reboot this can change the drive, mention something persistent
+              # Use a persistent disk path to prevent device name changes after reboot; replace with actual disk identifier.
+            - /dev/disk/by-path/<persistent-disk-identifier>
         thinPoolConfig:
           name: thin-pool-2
           sizePercent: 90

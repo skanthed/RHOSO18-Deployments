@@ -52,8 +52,9 @@ oc describe secret osp-secret -n openstack
 # For each worker node
 oc get nodes -l node-role.kubernetes.io/worker -o jsonpath="{.items[*].metadata.name}"
 
-# Apply NNCP config
+# Apply NNCP config from :
 rhoso18-openstack-on-openshift/control-plane/networking/
+
 #oc apply node network configuration policy according to your network
 oc apply -f control-plane/networking/nncp-master-0.yaml
 oc apply -f control-plane/networking/nncp-master-1.yaml

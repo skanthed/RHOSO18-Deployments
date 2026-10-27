@@ -6,12 +6,13 @@ metadata:
   namespace: openstack
 spec:
   secret: osp-secret
-  storageClass: lvms-local-storage-osac
+  storageClass: lvms-local-storage-oac
 
-# DNS service
+
+  # DNS service
   dns:
     template:
-      replicas: 1
+      replicas: 3
       options:
         - key: server
           values:
@@ -26,6 +27,7 @@ spec:
           spec:
             type: LoadBalancer
   
+
   # Identity service (keystone)
   keystone:
     apiOverride:
@@ -33,7 +35,7 @@ spec:
     template:
       databaseInstance: openstack
       secret: osp-secret
-      replicas: 1
+      replicas: 3
       override:
         service:
           internal:
@@ -48,7 +50,7 @@ spec:
 
   # Image service (glance)
   glance:
-    enabled: false
+    enabled: true
     apiOverrides:
       default:
         route: {}
@@ -56,13 +58,13 @@ spec:
       databaseInstance: openstack
       storage:
         storageRequest: 10G
-        storageClass: lvms-local-storage-osac
+        storageClass: lvms-local-storage-oac
       secret: osp-secret
       keystoneEndpoint: default
       glanceAPIs:
         default:
-          replicas: 0
-          layout: single
+          replicas: 3
+          type: single
           override:
             service:
               internal:
@@ -75,21 +77,22 @@ spec:
                   type: LoadBalancer
           networkAttachments: []
   
+
   # Networking service (neutron)
   neutron:
     apiOverride:
       route: {}
     template:
-      replicas: 1
+      replicas: 3
       customServiceConfig: |   
         [agent]
         report_interval = 300
 
-        [ml2_type_flat]
-        flat_networks = ironic
+        # [ml2_type_flat]
+        # flat_networks = ironic
 
         [ml2_type_vlan]
-        network_vlan_ranges = tenant-baremetal:51:100
+        network_vlan_ranges = bmnet:51:100
 
         [ml2]
         type_drivers = geneve,vxlan,vlan,flat,local
@@ -133,7 +136,7 @@ spec:
       ovnController:
         networkAttachment: tenant
         nicMappings:
-          ironic: ironic
+          bmnet: ironicbr
       ovnDBCluster:
         ovndbcluster-nb:
           replicas: 1
@@ -147,6 +150,7 @@ spec:
           networkAttachment: internalapi
       ovnNorthd: {}
 
+ 
   # Memcached cluster
   memcached:
     templates:
@@ -158,9 +162,10 @@ spec:
   galera:
     templates:
       openstack:
-        storageRequest: 5000M
+        storageRequest: 5Gi
         secret: osp-secret
         replicas: 1
+
 
   # RabbitMQ clusters (control plane)
   rabbitmq:
@@ -176,6 +181,7 @@ spec:
             spec:
               type: LoadBalancer
 
+
   # Bare metal provisioning (Ironic)
   ironic:
     enabled: true
@@ -184,7 +190,7 @@ spec:
       databaseInstance: openstack
       secret: osp-secret
       ironicAPI:
-        replicas: 1
+        replicas: 3
         customServiceConfig: |  
           [DEFAULT]
           default_network_interface = neutron
@@ -205,11 +211,11 @@ spec:
               spec:
                 type: LoadBalancer
       ironicConductors:
-        - replicas: 1
+        - replicas: 3
           customServiceConfig: |
             [DEFAULT]
             default_network_interface = neutron
-
+            
             [neutron]
             cleaning_network = <ironic_network_uuid>
             provisioning_network = <ironic_network_uuid>
@@ -220,18 +226,14 @@ spec:
             - ironic
           provisionNetwork: ironic
       ironicInspector:
-        replicas: 1
+        replicas: 0
         networkAttachments:
           - ironic
         inspectionNetwork: ironic
-        dhcpRanges:
-          - name: inspector-range
-            cidr: 172.20.1.0/24
-            start: 172.20.1.190
-            end: 172.20.1.199
 
       ironicNeutronAgent:
-        replicas: 1
+        replicas: 3
+
 
   cinder:
     enabled: false
@@ -251,4 +253,3 @@ spec:
     enabled: false
   manila:
     enabled: false
-

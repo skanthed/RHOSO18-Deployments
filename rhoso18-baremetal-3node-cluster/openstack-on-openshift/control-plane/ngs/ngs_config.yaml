@@ -14,6 +14,7 @@ stringData:
     ngs_mac_address = 68:4f:64:1d:01:d5
     ngs_save_configuration = True
     ngs_manage_vlans = false
+    ngs_trunk_ports = portname
     ip = ip address
     username = admin
     password = password
@@ -24,6 +25,7 @@ stringData:
     ngs_mac_address = b0:cf:0e:0f:b9:fd
     ngs_save_configuration = True
     ngs_manage_vlans = false
+    ngs_trunk_ports = portname
     ip = ip address
     username = admin
     password = password

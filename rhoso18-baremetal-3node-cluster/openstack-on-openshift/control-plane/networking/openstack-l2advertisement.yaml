@@ -44,4 +44,4 @@ spec:
   ipAddressPools:
     - ironic
   interfaces:
-    - ironic
+    - ironicbr.83
